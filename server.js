@@ -9,8 +9,8 @@ const error = require("./middleware/error");
 const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
 const ApiFeatures = require('./utils/apiFeatures');
-var bodyParser = require('body-parser')
-
+var bodyParser = require('body-parser');
+var cors = require('cors')
 // dotenv
 dotenv.config();
 // database connections
@@ -18,6 +18,7 @@ connectDataBase();
 app.use(bodyParser.urlencoded({ extended: false }))
 
 // parse application/json
+app.use(cors())
 app.use(bodyParser.json())
 app.use(express.json());
 app.use(cookieParser())
