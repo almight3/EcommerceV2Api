@@ -19,11 +19,11 @@ const login = asyncErrorHandler(async(req,res,next)=>{
      const user = await User.findOne({email:email}).select("+password");
      
      if(!user){
-        new ErrorHandler("Invalid username or password",401)
+      return next(new ErrorHandler("Invalid username or password",401))
      };
      const isPasswordMatch = await user.comparePassword(password)
      if(!isPasswordMatch ){
-        new ErrorHandler("Invalid username or password",401)
+      return next(new ErrorHandler("Invalid username or password",401))
      };
 
      sendToken(user,201,res);
