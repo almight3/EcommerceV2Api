@@ -16,18 +16,14 @@ const productSchema = new Schema({
         maxLength:[8,"price cannot exceed 8 character"]
 
      },
-     image:[
-        {
-            public_id:{
-                type:String,
-                required:true
-            },
-            url_id:{
-                type:String,
-                required:true
-            }
-        },
-     ],
+     image:{
+        type:String,
+        required:[true,"please enter image url"]
+     },
+     anime:{
+        type:String,
+        required:[true,"please enter anime name"]
+     },
      stocks:{
         type:Number,
         required:[true,"please enter product stocks"],
