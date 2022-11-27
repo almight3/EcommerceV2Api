@@ -1,9 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const {processPayment,sendPaymentApiKey} = require("../Controller/paymentController");
-const {authenticateUser} = require("../middleware/auth")
+const {checkout,paymentVerfication,razorPaykey} = require("../Controller/paymentController.js");
+const {authenticateUser} = require("../middleware/auth");
 
-router.route("/payments").post(authenticateUser,processPayment);
-router.route('/paymentsapikey').get(authenticateUser,sendPaymentApiKey);
+router.route("/chekout").post(authenticateUser,checkout);
+router.route("/paymentVerfication").post(authenticateUser,paymentVerfication)
+router.route("/payment/key").get(authenticateUser,razorPaykey)
 
-module.exports = router
+module.exports = router;

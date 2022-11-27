@@ -1,31 +1,58 @@
 const asyncErrorHandler = require("../middleware/asyncErrorHandler");
-const stripe = require('stripe')('sk_test_51LsWNvSA7jorJbwpSd74jTjTiSJtn5MFMekOTM9Tx1MtjGeynDEg0fI0t7HnrADes6cUkCBxwgESDJWnyqw3P7rq00wh8LU5Ay');
+const ErrorHandler = require("../utils/errorhandler");
+const Razorpay = require('razorpay');
+var crypto = require("crypto");
+const dotenv = require('dotenv');
+dotenv.config();
 
-//making payments
-const processPayment = asyncErrorHandler(async(req,res,next)=>{
-      console.log(res.body)
-      const payment = await stripe.paymentIntents.create({
-        amount: 5000,
-        currency: 'inr',
-        metadata:{
-        company:"ecommerce"
-       }
-      });
-      res.status(200).json({
-        success:true,
-        client_secret:payment.client_secret
-      });
+
+
+var instance = new Razorpay({
+  key_id:process.env.RAZORPAY_ID,
+  key_secret: process.env.RAZORPAY_KEY,
+})
+console.log(process.env.RAZORPAY_ID)
+ const checkout = asyncErrorHandler(async(req,res)=>{
+  const {amount} = req.body
+  var options = {
+    amount: Number(amount*100),  
+    currency: "INR",
+  };
+  const order = await  instance.orders.create(options);
+  console.log(order)
+  res.status(200).json({
+    success:true,
+    order
+  })
 });
-// sending stripe apikey
 
-const sendPaymentApiKey = asyncErrorHandler(async(req,res,next)=>{
-     console.log("api key")
-     res.status(200).json({
-        stripeApiKey:process.env.STRIPE_API_KEY
-     })
+ const paymentVerfication = asyncErrorHandler(async(req,res,next)=>{
+ const {razorpay_order_id ,razorpay_payment_id ,razorpay_signature} = req.body;
+ let body=razorpay_order_id + "|" + razorpay_payment_id;
+ const expectedSignature = crypto.createHmac('sha256', process.env.RAZORPAY_KEY)
+                                 .update(body.toString())
+                                 .digest('hex');
+                                 console.log("sig received " ,razorpay_signature);
+                                 console.log("sig generated " ,expectedSignature);
+ 
+  const isVerfied = expectedSignature === razorpay_signature;
+  if(isVerfied){
+    res.redirect(
+      `http://localhost:3000/paymentsuccess?reference=${razorpay_payment_id}`
+    );
+  }
+  else{
+    return next(new ErrorHandler(400,"payment failed"))
+  }
+  
 });
 
-module.exports = {sendPaymentApiKey,processPayment}
+ const razorPaykey = asyncErrorHandler(async(req,res)=>{
+  res.status(200).json({
+    success:true,
+    id:process.env.RAZORPAY_ID,
+    key:process.env.RAZORPAY_KEY
+  })
+});
 
-
-
+module.exports ={checkout,paymentVerfication,razorPaykey}
