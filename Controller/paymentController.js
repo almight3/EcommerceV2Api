@@ -42,7 +42,7 @@ const isAuthentic = expectedSignature === razorpay_signature;
 if (isAuthentic) {
 
   res.redirect(
-    `http://localhost:3000/paymentsuccess?reference=${razorpay_payment_id}`
+    `https://indianotakushope.vercel.app/paymentsuccess?reference=${razorpay_payment_id}`
   );
 } else {
   res.status(400).json({
