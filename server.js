@@ -15,11 +15,12 @@ var cors = require('cors')
 dotenv.config();
 // database connections
 connectDataBase();
-app.use(bodyParser.urlencoded({ extended: false }))
+//payment instanciate
+
 
 // parse application/json
+app.use(bodyParser.urlencoded({ extended: false }))
 app.use(cors())
-app.use(bodyParser.json())
 app.use(express.json());
 app.use(cookieParser())
 app.use("/api/v1",productRoutes);

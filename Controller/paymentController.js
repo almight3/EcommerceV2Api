@@ -8,42 +8,45 @@ dotenv.config();
 
 
 var instance = new Razorpay({
-  key_id:process.env.RAZORPAY_ID,
-  key_secret: process.env.RAZORPAY_KEY,
+  key_id:"rzp_test_aFuGXl6epqMAZC",
+  key_secret:"vyEDhjBVw0iKcFZqiobwdk7B",
 })
 console.log(process.env.RAZORPAY_ID)
  const checkout = asyncErrorHandler(async(req,res)=>{
-  const {amount} = req.body
-  var options = {
-    amount: Number(amount*100),  
+  const options = {
+    amount: Number(req.body.amount * 100),
     currency: "INR",
   };
-  const order = await  instance.orders.create(options);
-  console.log(order)
+  const order = await instance.orders.create(options);
   res.status(200).json({
-    success:true,
-    order
-  })
+    success: true,
+    order,
+  });
 });
 
- const paymentVerfication = asyncErrorHandler(async(req,res,next)=>{
- const {razorpay_order_id ,razorpay_payment_id ,razorpay_signature} = req.body;
- let body=razorpay_order_id + "|" + razorpay_payment_id;
- const expectedSignature = crypto.createHmac('sha256', process.env.RAZORPAY_KEY)
-                                 .update(body.toString())
-                                 .digest('hex');
-                                 console.log("sig received " ,razorpay_signature);
-                                 console.log("sig generated " ,expectedSignature);
- 
-  const isVerfied = expectedSignature === razorpay_signature;
-  if(isVerfied){
-    res.redirect(
-      `http://localhost:3000/paymentsuccess?reference=${razorpay_payment_id}`
-    );
-  }
-  else{
-    return next(new ErrorHandler(400,"payment failed"))
-  }
+const paymentVerfication = asyncErrorHandler(async(req,res,next)=>{
+  const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
+  req.body;
+  console.log(razorpay_order_id, razorpay_payment_id, razorpay_signature)
+const body = razorpay_order_id + "|" + razorpay_payment_id;
+
+const expectedSignature = crypto
+  .createHmac("sha256", "vyEDhjBVw0iKcFZqiobwdk7B")
+  .update(body.toString())
+  .digest("hex");
+
+const isAuthentic = expectedSignature === razorpay_signature;
+
+if (isAuthentic) {
+
+  res.redirect(
+    `http://localhost:3000/paymentsuccess?reference=${razorpay_payment_id}`
+  );
+} else {
+  res.status(400).json({
+    success: false,
+  });
+}
   
 });
 

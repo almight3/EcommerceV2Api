@@ -1,5 +1,6 @@
 const ErrorHandler = require("../utils/errorhandler")
 module.exports = (err,req,res,next)=>{
+     console.log(err)
     err.statusCode = err.statusCode || 500;
     err.message = err.message || "Internal server Error";
 // Mongoose duplicate key error
@@ -13,7 +14,6 @@ module.exports = (err,req,res,next)=>{
         const message = `Resource not found.Invalid: ${err.path})`
         err = new ErrorHandler(message,400)
     }
-    
 
     res.status(err.statusCode).json({
         success:false,
