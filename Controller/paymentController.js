@@ -7,14 +7,16 @@ dotenv.config();
 
 
 
-var instance = new Razorpay({
-  key_id:"rzp_test_aFuGXl6epqMAZC",
-  key_secret:"vyEDhjBVw0iKcFZqiobwdk7B",
-})
-console.log(process.env.RAZORPAY_ID)
+
+
  const checkout = asyncErrorHandler(async(req,res)=>{
+  var instance = new Razorpay({
+    key_id:"rzp_test_aFuGXl6epqMAZC",
+    key_secret:"vyEDhjBVw0iKcFZqiobwdk7B",
+  })
+  const {amount} = req.body
   const options = {
-    amount: Number(req.body.amount * 100),
+    amount: parseInt(amount * 100),
     currency: "INR",
   };
   const order = await instance.orders.create(options);
